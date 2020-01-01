@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from copy import deepcopy
 
 def printBoard(board):
 	for i in range(9):
@@ -35,15 +36,12 @@ def solve(board, x, y):
 		for j in range(y - y % 3, y - y % 3 + 3):
 			possible.discard(board[j][i])
 
-	newBoard = list(board)
 	nextX = (x + 1) % 9
 	nextY = y + (x == 8)
+	newBoard = deepcopy(board)
 
 	for num in possible:
-		print(x, y)
-		print(possible)
 		newBoard[y][x] = num
-		print(num)
 		if x == 8 and y == 8:
 			printBoard(newBoard)
 			return True
