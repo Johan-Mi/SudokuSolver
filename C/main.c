@@ -38,16 +38,13 @@ bool solve(const char board[9][9], int x, int y) {
 	memset(possible, true, sizeof(possible));
 
 	for(int i = 0; i < 9; i++) {
-		if(newBoard[y][i])
-			possible[newBoard[y][i] - 1] = false;
-		if(newBoard[i][x])
-			possible[newBoard[i][x] - 1] = false;
+		possible[newBoard[y][i] - 1] &= !newBoard[y][i];
+		possible[newBoard[i][x] - 1] &= !newBoard[i][x];
 	}
 
 	for(int i = x - x % 3; i < x - x % 3 + 3; i++)
 		for(int j = y - y % 3; j < y - y % 3 + 3; j++)
-			if(newBoard[j][i])
-				possible[newBoard[j][i] - 1] = false;
+			possible[newBoard[j][i] - 1] &= !newBoard[j][i];
 
 	for(int i = 0; i < 9; i++) {
 		if(possible[i]) {
