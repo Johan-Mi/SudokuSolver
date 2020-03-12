@@ -4,8 +4,8 @@
 #include <string.h>
 
 void printBoard(const char board[9][9]) {
-	for(int i = 0; i < 9; i++) {
-		for(int j = 0; j < 9; j++) {
+	for(unsigned char i = 0; i < 9; i++) {
+		for(unsigned char j = 0; j < 9; j++) {
 			putchar(board[i][j] ? board[i][j] + '0' : ' ');
 			if(j == 2 || j == 5)
 				printf("│");
@@ -17,7 +17,7 @@ void printBoard(const char board[9][9]) {
 	putchar('\n');
 }
 
-bool solve(const char board[9][9], int x, int y) {
+bool solve(const char board[9][9], unsigned char x, unsigned char y) {
 	while(board[y][x]) {
 		if(x == 8 && y == 8) {
 			printBoard(board);
@@ -31,22 +31,22 @@ bool solve(const char board[9][9], int x, int y) {
 	char newBoard[9][9];
 	memcpy(newBoard, board, 81);
 
-	int nextX = (x + 1) % 9;
-	int nextY = y + (x == 8);
+	unsigned char nextX = (x + 1) % 9;
+	unsigned char nextY = y + (x == 8);
 
 	bool possible[9];
 	memset(possible, true, sizeof(possible));
 
-	for(int i = 0; i < 9; i++) {
+	for(unsigned char i = 0; i < 9; i++) {
 		possible[newBoard[y][i] - 1] &= !newBoard[y][i];
 		possible[newBoard[i][x] - 1] &= !newBoard[i][x];
 	}
 
-	for(int i = x - x % 3; i < x - x % 3 + 3; i++)
-		for(int j = y - y % 3; j < y - y % 3 + 3; j++)
+	for(unsigned char i = x - x % 3; i < x - x % 3 + 3; i++)
+		for(unsigned char j = y - y % 3; j < y - y % 3 + 3; j++)
 			possible[newBoard[j][i] - 1] &= !newBoard[j][i];
 
-	for(int i = 0; i < 9; i++) {
+	for(unsigned char i = 0; i < 9; i++) {
 		if(possible[i]) {
 			newBoard[y][x] = i + 1;
 			if(x == 8 && y == 8) {
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 	long size = ftell(fp);
 	rewind(fp);
 
-	char* buffer = (char*)calloc(1, size + 1);
+	char* buffer = calloc(1, size + 1);
 	if(!buffer) {
 		fclose(fp);
 		fputs("Memory allocation failed\n", stderr);
@@ -93,11 +93,10 @@ int main(int argc, char* argv[]) {
 
 	char board[9][9];
 
-	for(int i = 0; i < 9; i++) {
-		for(int j = 0; j < 9; j++) {
+	for(unsigned char i = 0; i < 9; i++) {
+		for(unsigned char j = 0; j < 9; j++) {
 			char currChar = buffer[i * 10 + j];
 			switch(currChar) {
-				case '0':
 				case ' ':
 				case '.':
 				case '-':
@@ -105,7 +104,7 @@ int main(int argc, char* argv[]) {
 					board[i][j] = 0;
 					break;
 				default:
-					if(currChar > '0' && currChar <= '9')
+					if(currChar >= '0' && currChar <= '9')
 						board[i][j] = currChar - '0';
 					else {
 						fputs("Invalid character in input file\n", stderr);
@@ -121,6 +120,5 @@ int main(int argc, char* argv[]) {
 
 	printBoard(board);
 
-	if(!solve(board, 0, 0))
-		puts("No solution found");
+	solve(board, 0, 0) || puts("No solution found");
 }
