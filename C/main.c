@@ -3,26 +3,29 @@
 #include <stdio.h>
 #include <string.h>
 
-void printBoard(const char board[9][9]) {
+void printBoard(char const board[9][9]) {
 	for(unsigned char i = 0; i < 9; i++) {
 		for(unsigned char j = 0; j < 9; j++) {
 			putchar(board[i][j] ? board[i][j] + '0' : ' ');
-			if(j == 2 || j == 5)
+			if(j == 2 || j == 5) {
 				printf("│");
+			}
 		}
 		putchar('\n');
-		if(i == 2 || i == 5)
+		if(i == 2 || i == 5) {
 			puts("───┼───┼───");
+		}
 	}
 	putchar('\n');
 }
 
-bool solve(const char board[9][9], unsigned char x, unsigned char y) {
+bool solve(char const board[9][9], unsigned char x, unsigned char y) {
 	while(board[y][x]) {
 		if(x == 8 && y == 8) {
 			printBoard(board);
 			return true;
-		} else if(++x == 9) {
+		}
+		if(++x == 9) {
 			y++;
 			x = 0;
 		}
@@ -31,8 +34,8 @@ bool solve(const char board[9][9], unsigned char x, unsigned char y) {
 	char newBoard[9][9];
 	memcpy(newBoard, board, 81);
 
-	unsigned char nextX = (x + 1) % 9;
-	unsigned char nextY = y + (x == 8);
+	unsigned char const nextX = (x + 1) % 9;
+	unsigned char const nextY = y + (x == 8);
 
 	bool possible[9];
 	memset(possible, true, sizeof(possible));
@@ -42,9 +45,11 @@ bool solve(const char board[9][9], unsigned char x, unsigned char y) {
 		possible[newBoard[i][x] - 1] &= !newBoard[i][x];
 	}
 
-	for(unsigned char i = x - x % 3; i < x - x % 3 + 3; i++)
-		for(unsigned char j = y - y % 3; j < y - y % 3 + 3; j++)
+	for(unsigned char i = x - x % 3; i < x - x % 3 + 3; i++) {
+		for(unsigned char j = y - y % 3; j < y - y % 3 + 3; j++) {
 			possible[newBoard[j][i] - 1] &= !newBoard[j][i];
+		}
+	}
 
 	for(unsigned char i = 0; i < 9; i++) {
 		if(possible[i]) {
@@ -53,21 +58,22 @@ bool solve(const char board[9][9], unsigned char x, unsigned char y) {
 				printBoard(newBoard);
 				return true;
 			}
-			if(solve(newBoard, nextX, nextY))
+			if(solve(newBoard, nextX, nextY)) {
 				return true;
+			}
 		}
 	}
 
 	return false;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 	if(argc != 2) {
 		printf("Usage: %s (name of sudoku file)\n", argv[0]);
 		return 1;
 	}
 
-	FILE* fp = fopen(argv[1], "rb");
+	FILE *fp = fopen(argv[1], "rb");
 	if(!fp) {
 		perror(argv[1]);
 		return 1;
@@ -77,7 +83,7 @@ int main(int argc, char* argv[]) {
 	long size = ftell(fp);
 	rewind(fp);
 
-	char* buffer = calloc(1, size + 1);
+	char *buffer = calloc(1, size + 1);
 	if(!buffer) {
 		fclose(fp);
 		fputs("Memory allocation failed\n", stderr);
@@ -95,7 +101,7 @@ int main(int argc, char* argv[]) {
 
 	for(unsigned char i = 0; i < 9; i++) {
 		for(unsigned char j = 0; j < 9; j++) {
-			char currChar = buffer[i * 10 + j];
+			char const currChar = buffer[i * 10 + j];
 			switch(currChar) {
 				case ' ':
 				case '.':
@@ -103,14 +109,12 @@ int main(int argc, char* argv[]) {
 				case '_':
 					board[i][j] = 0;
 					break;
-				default:
-					if(currChar >= '0' && currChar <= '9')
-						board[i][j] = currChar - '0';
-					else {
-						fputs("Invalid character in input file\n", stderr);
-						return 1;
-					}
+				case '0' ... '9':
+					board[i][j] = currChar - '0';
 					break;
+				default:
+					fputs("Invalid character in input file\n", stderr);
+					return 1;
 			}
 		}
 	}
@@ -120,5 +124,7 @@ int main(int argc, char* argv[]) {
 
 	printBoard(board);
 
-	solve(board, 0, 0) || puts("No solution found");
+	if(!solve(board, 0, 0)) {
+		puts("No solution found");
+	}
 }

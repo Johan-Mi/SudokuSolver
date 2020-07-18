@@ -10,13 +10,13 @@ def print_board(board):
     """Prints a 9x9 list of numbers as a sudoku board."""
     for i in range(9):
         for j in range(9):
-            print(board[i][j] if board[i][j] else ' ', end='')
+            print(board[i][j] if board[i][j] else " ", end="")
             if j in (2, 5):
-                print('│', end='')
-        print('')
+                print("│", end="")
+        print()
         if i in (2, 5):
-            print('───┼───┼───')
-    print('')
+            print("───┼───┼───")
+    print()
 
 
 def solve(board, x_pos, y_pos):
@@ -58,7 +58,7 @@ def solve(board, x_pos, y_pos):
 def main():
     """Reads a sudoku board from a specified file and solves it."""
     if len(sys.argv) != 2:
-        print('Usage: %s (name of sudoku file)' % sys.argv[0])
+        print(f"Usage: {sys.argv[0]} (name of sudoku file)")
         sys.exit()
 
     in_file = Path(sys.argv[1]).read_text()
@@ -68,12 +68,12 @@ def main():
     for i in range(9):
         for j in range(9):
             curr_char = in_file[i * 10 + j]
-            board[i][j] = 0 if curr_char in ' .-_' else int(curr_char)
+            board[i][j] = 0 if curr_char in " .-_" else int(curr_char)
 
     print_board(board)
 
     if not solve(board, 0, 0):
-        print('No solution found')
+        print("No solution found")
 
 if __name__ == "__main__":
     main()
