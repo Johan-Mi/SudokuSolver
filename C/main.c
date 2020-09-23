@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void printBoard(char const board[9][9]) {
+void print_board(char const board[9][9]) {
 	for(unsigned char i = 0; i < 9; i++) {
 		for(unsigned char j = 0; j < 9; j++) {
 			putchar(board[i][j] ? board[i][j] + '0' : ' ');
@@ -19,10 +19,10 @@ void printBoard(char const board[9][9]) {
 	putchar('\n');
 }
 
-bool solve(char const board[9][9], unsigned char x, unsigned char y) {
+bool solve(char board[9][9], unsigned char x, unsigned char y) {
 	while(board[y][x]) {
 		if(x == 8 && y == 8) {
-			printBoard(board);
+			print_board(board);
 			return true;
 		}
 		if(++x == 9) {
@@ -31,38 +31,37 @@ bool solve(char const board[9][9], unsigned char x, unsigned char y) {
 		}
 	}
 
-	char newBoard[9][9];
-	memcpy(newBoard, board, 81);
-
-	unsigned char const nextX = (x + 1) % 9;
-	unsigned char const nextY = y + (x == 8);
-
 	bool possible[9];
 	memset(possible, true, sizeof(possible));
 
 	for(unsigned char i = 0; i < 9; i++) {
-		possible[newBoard[y][i] - 1] &= !newBoard[y][i];
-		possible[newBoard[i][x] - 1] &= !newBoard[i][x];
+		possible[board[y][i] - 1] &= !board[y][i];
+		possible[board[i][x] - 1] &= !board[i][x];
 	}
 
 	for(unsigned char i = x - x % 3; i < x - x % 3 + 3; i++) {
 		for(unsigned char j = y - y % 3; j < y - y % 3 + 3; j++) {
-			possible[newBoard[j][i] - 1] &= !newBoard[j][i];
+			possible[board[j][i] - 1] &= !board[j][i];
 		}
 	}
 
+	unsigned char const next_x = (x + 1) % 9;
+	unsigned char const next_y = y + (x == 8);
+
 	for(unsigned char i = 0; i < 9; i++) {
 		if(possible[i]) {
-			newBoard[y][x] = i + 1;
+			board[y][x] = i + 1;
 			if(x == 8 && y == 8) {
-				printBoard(newBoard);
+				print_board(board);
 				return true;
 			}
-			if(solve(newBoard, nextX, nextY)) {
+			if(solve(board, next_x, next_y)) {
 				return true;
 			}
 		}
 	}
+
+	board[y][x] = 0;
 
 	return false;
 }
@@ -101,8 +100,8 @@ int main(int argc, char *argv[]) {
 
 	for(unsigned char i = 0; i < 9; i++) {
 		for(unsigned char j = 0; j < 9; j++) {
-			char const currChar = buffer[i * 10 + j];
-			switch(currChar) {
+			char const curr_char = buffer[i * 10 + j];
+			switch(curr_char) {
 				case ' ':
 				case '.':
 				case '-':
@@ -110,7 +109,7 @@ int main(int argc, char *argv[]) {
 					board[i][j] = 0;
 					break;
 				case '0' ... '9':
-					board[i][j] = currChar - '0';
+					board[i][j] = curr_char - '0';
 					break;
 				default:
 					fputs("Invalid character in input file\n", stderr);
@@ -122,7 +121,7 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 	free(buffer);
 
-	printBoard(board);
+	print_board(board);
 
 	if(!solve(board, 0, 0)) {
 		puts("No solution found");
